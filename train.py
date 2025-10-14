@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import pandas as pd
 import pickle as pkl
 from sklearn.compose import ColumnTransformer
@@ -32,6 +33,8 @@ from sklearn.experimental import enable_halving_search_cv  # noqa: F401
 from sklearn.model_selection import HalvingRandomSearchCV
 warnings.filterwarnings(action='ignore')
 
+random.seed(100473223)
+np.random.seed(100473223)
 # =============================================================================
 # 1. CARGA Y EXPLORACIÓN DE DATOS
 # =============================================================================
@@ -104,6 +107,40 @@ print(f"\nColumnas numéricas: {len(numerical_cols)}")
 print(f"Columnas ordinales: {len(ordinal_cols)}")
 print(f"Columnas categóricas: {len(categorical_cols)}")
 
+
+# Análisis de valores faltantes
+print("\n" + "="*50)
+print("ANÁLISIS DE VALORES FALTANTES")
+print("="*50)
+missing_values = X_train.isnull().sum()
+missing_percent = (missing_values / len(X_train)) * 100
+missing_df = pd.DataFrame({
+    'Columna': missing_values.index,
+    'Valores_Faltantes': missing_values.values,
+    'Porcentaje': missing_percent.values
+})
+missing_df = missing_df[missing_df['Valores_Faltantes'] > 0].sort_values('Valores_Faltantes', ascending=False)
+if len(missing_df) > 0:
+    print(missing_df.to_string(index=False))
+else:
+    print("✓ No hay valores faltantes en el dataset")
+print(f"\nTotal de columnas con valores faltantes: {len(missing_df)}")
+    
+# Eliminar columnas con >30% de valores faltantes
+cols_to_drop = missing_df[missing_df['Porcentaje'] > 30]['Columna'].tolist()
+if cols_to_drop:
+    print(f"\n⚠ Eliminando columnas con >30% de valores faltantes: {cols_to_drop}")
+    X_train = X_train.drop(columns=cols_to_drop)
+    X_test = X_test.drop(columns=cols_to_drop)
+    
+    # Actualizar listas de columnas
+    numerical_cols = [col for col in numerical_cols if col not in cols_to_drop]
+    categorical_cols = [col for col in categorical_cols if col not in cols_to_drop]
+    ordinal_cols = {k: v for k, v in ordinal_cols.items() if k not in cols_to_drop}
+    
+    print(f"✓ Columnas eliminadas. Nuevas dimensiones: {X_train.shape}")
+else:
+    print("✓ No hay valores faltantes en el dataset")
 # === Sustituye todo tu bloque de preprocesado y pipeline por este ===
 from sklearn.pipeline import Pipeline as SkPipeline
 from sklearn.compose import ColumnTransformer
