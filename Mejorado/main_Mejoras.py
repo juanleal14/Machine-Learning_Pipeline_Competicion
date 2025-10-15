@@ -1,0 +1,120 @@
+import argparse
+import numpy as np
+import pandas as pd
+import sys
+import pickle as pkl
+import os
+
+def predict(input):
+    """
+    Generates the prediction using the trained model.
+    
+    This function:
+    1. Loads the trained model (with optimal threshold)
+    2. Preprocesses the input data
+    3. Generates predictions using the optimal threshold
+    4. Returns a dataframe with ID and Attrition columns
+    
+    @param input: the input dataframe with features
+    @return: a dataframe with two columns: ID, Attrition
+    """
+    
+    # Load the model and optimal threshold
+    here = os.path.dirname(os.path.abspath(__file__))
+    model_candidates = ["best_model_improved.pkl", "best_model_final.pkl", "best_model.pkl"]
+    
+    model = None
+    threshold = 0.5  # default
+    
+    for model_name in model_candidates:
+        model_path = os.path.join(here, model_name)
+        if os.path.isfile(model_path):
+            with open(model_path, "rb") as f:
+                loaded = pkl.load(f)
+            
+            # Check if it's the improved model (dictionary format)
+            if isinstance(loaded, dict) and 'model' in loaded:
+                model = loaded['model']
+                threshold = loaded['optimal_threshold']
+                #print(f"✓ Loaded improved model: {model_name}", file=sys.stderr)
+                #print(f"  Optimal threshold: {threshold:.3f}", file=sys.stderr)
+            else:
+                # Legacy model (just the pipeline)
+                model = loaded
+                threshold = 0.5
+                #print(f"✓ Loaded legacy model: {model_name}", file=sys.stderr)
+                #print(f"  Using default threshold: 0.5", file=sys.stderr)
+            break
+    
+    if model is None:
+        print("Error: Model file not found.", file=sys.stderr)
+        print(f"Searched for: {', '.join(model_candidates)}", file=sys.stderr)
+        sys.exit(1)
+    
+    # Prepare output dataframe
+    output = pd.DataFrame()
+    output['ID'] = input['ID']
+    
+    # Remove ID and Attrition (if present) from features
+    X = input.drop(columns=['ID'], errors='ignore')
+    if 'Attrition' in X.columns:
+        X = X.drop(columns=['Attrition'])
+    
+    # Generate predictions
+    try:
+        # Get probabilities for optimal threshold
+        if hasattr(model, "predict_proba"):
+            y_proba = model.predict_proba(X)
+            # Extract probability of positive class (Attrition = Yes)
+            if y_proba.ndim == 2:
+                pos_proba = y_proba[:, 1]
+            else:
+                pos_proba = y_proba
+            
+            # Apply optimal threshold
+            y_pred = (pos_proba >= threshold).astype(int)
+        else:
+            # Fallback to direct prediction if no predict_proba
+            y_pred = model.predict(X)
+        
+        # Convert to 'Yes'/'No' labels
+        attrition = np.where(y_pred == 1, 'Yes', 'No')
+        output['Attrition'] = attrition
+        
+    except Exception as e:
+        print(f"Error during prediction: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        sys.exit(1)
+    
+    return output
+
+
+if __name__ == '__main__':
+    
+    # Creates a parser to receive the input argument.
+    parser = argparse.ArgumentParser(
+        description='Predict employee attrition using trained ML model.'
+    )
+    parser.add_argument('file', help='Path to the data file (CSV format).')
+    args = parser.parse_args()
+    
+    # Read the argument and load the data.
+    try:
+        data = pd.read_csv(args.file)
+    except:
+        print("Error: the input file does not have a valid format.", file=sys.stderr)
+        exit(1)
+    
+    # Validate that ID column exists
+    if 'ID' not in data.columns:
+        print("Error: missing 'ID' column in input.", file=sys.stderr)
+        exit(1)
+    
+    # Computes the predictions using the trained model
+    output = predict(data)
+    
+    # Writes the output to stdout
+    print('ID,Attrition')
+    for r in output.itertuples():
+        print(f'{r.ID},{r.Attrition}')
