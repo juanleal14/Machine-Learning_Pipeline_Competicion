@@ -5,6 +5,60 @@ import sys
 import pickle as pkl
 import os
 
+# CRÍTICO: Importar FeatureEngineer para que pickle pueda deserializar el modelo
+
+from sklearn.base import BaseEstimator, TransformerMixin
+
+class FeatureEngineer(BaseEstimator, TransformerMixin):
+    """Feature engineering transformer"""
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        X = X.copy()
+        
+        def safe_divide(a, b):
+            return np.where(b != 0, a / b, 0)
+        
+        X['Years_per_Company_Ratio'] = safe_divide(
+            X['Total Active Years'], 
+            X['Number of Other Companies'] + 1
+        )
+        X['Promotion_Lag'] = X['Years at Current Company'] - X['Years Since Last Promotion']
+        X['Income_per_Year'] = safe_divide(
+            X['Yearly Income'], 
+            X['Total Active Years'] + 1
+        )
+        X['Manager_Stability'] = safe_divide(
+            X['Years with Current Manager'], 
+            X['Years at Current Company'] + 1
+        )
+        
+        satisfaction_cols = ['Job Satisfaction', 'Environment Satisfaction', 
+                            'Work Life Balance Satisfaction']
+        X['Overall_Satisfaction'] = X[satisfaction_cols].mean(axis=1, skipna=True)
+        
+        X['Low_Satisfaction'] = (X['Overall_Satisfaction'] < 3).astype(int)
+        X['Recent_Hire'] = (X['Years at Current Company'] < 2).astype(int)
+        X['Overdue_Promotion'] = (X['Years Since Last Promotion'] > 3).astype(int)
+        
+        if 'Miles from Home to Work' in X.columns:
+            X['Long_Commute'] = (X['Miles from Home to Work'] > 20).astype(int)
+        
+        if 'Job Level' in X.columns:
+            job_level_numeric = pd.factorize(X['Job Level'])[0]
+            X['Age_x_JobLevel'] = X['Age'] * job_level_numeric
+        else:
+            X['Age_x_JobLevel'] = 0
+        
+        median_income = X['Yearly Income'].median()
+        X['LowSat_LowIncome'] = (
+            (X['Overall_Satisfaction'] < 3) & 
+            (X['Yearly Income'] < median_income)
+        ).astype(int)
+        
+        return X
+
 def predict(input):
     """
     Generates the prediction using the trained model.
@@ -36,20 +90,7 @@ def predict(input):
             if isinstance(loaded, dict) and 'model' in loaded:
                 model = loaded['model']
                 threshold = loaded['optimal_threshold']
-                #print(f"✓ Loaded improved model: {model_name}", file=sys.stderr)
-                #print(f"  Optimal threshold: {threshold:.3f}", file=sys.stderr)
-            else:
-                # Legacy model (just the pipeline)
-                model = loaded
-                threshold = 0.5
-                #print(f"✓ Loaded legacy model: {model_name}", file=sys.stderr)
-                #print(f"  Using default threshold: 0.5", file=sys.stderr)
-            break
-    
-    if model is None:
-        print("Error: Model file not found.", file=sys.stderr)
-        print(f"Searched for: {', '.join(model_candidates)}", file=sys.stderr)
-        sys.exit(1)
+
     
     # Prepare output dataframe
     output = pd.DataFrame()

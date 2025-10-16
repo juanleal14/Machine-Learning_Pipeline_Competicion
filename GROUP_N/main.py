@@ -11,8 +11,8 @@ LABELS = {0: "No", 1: "Yes"}
 
 def load_model():
     here = os.path.dirname(os.path.abspath(__file__))
-    #candidates = ["best_model.pkl", "best_model_final.pkl"]
-    candidates = ["best_model_improved.pkl"]
+    candidates = ["best_model.pkl", "best_model_final.pkl"]
+    #candidates = ["best_model_improved.pkl"]
     for name in candidates:
         path = os.path.join(here, name)
         if os.path.isfile(path):

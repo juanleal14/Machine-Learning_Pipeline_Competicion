@@ -1,0 +1,6 @@
+ID,Age,Gender,Marital Status,Education Field,Education Level,Miles from Home to Work,Department Name,Job Role Name,Job Level,Business Travel Frequency,Yearly Income,Absences per Year,Job Involvement,Performance Rating,Job Satisfaction,Environment Satisfaction,Work Life Balance Satisfaction,Last Salary Increase (%),Amount of Stock Option,Number of Training Sessions Last Year,Number of Other Companies,Total Active Years,Years at Current Company,Years Since Last Promotion,Years with Current Manager
+1,38,Male,Married,Life Sciences,College,11,Research & Development,Sales Executive,Entry Level,Travel_Rarely,198450,20,High,3,3.0,4.0,2.0,11,Low,3,7.0,7.0,0,0,0
+2,45,Female,,Human Resources,Bachelor,14,Human Resources,Sales Executive,Entry Level,Travel_Rarely,54730,11,Low,3,,4.0,4.0,13,None,3,4.0,17.0,0,0,0
+3,29,Male,Single,Life Sciences,Doctor,3,Human Resources,Sales Executive,Entry Level,Travel_Rarely,27230,10,Medium,3,1.0,4.0,3.0,11,Low,2,6.0,3.0,0,0,0
+4,44,Male,Single,Life Sciences,Bachelor,20,Research & Development,Sales Representative,Entry Level,Non-Travel,45560,15,High,3,3.0,4.0,3.0,13,None,4,2.0,6.0,0,0,0
+5,21,Male,Single,Life Sciences,Bachelor,2,Sales,Manufacturing Director,Mid Level,Travel_Rarely,137570,18,High,3,4.0,,3.0,12,Low,3,1.0,0.0,0,0,0
