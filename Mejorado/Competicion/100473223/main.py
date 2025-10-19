@@ -75,7 +75,7 @@ def predict(input):
     
     # Load the model and optimal threshold
     here = os.path.dirname(os.path.abspath(__file__))
-    model_candidates = ["best_model_improved.pkl", "best_model_final.pkl", "best_model.pkl"]
+    model_candidates = ["best_model_improved.pkl"]
     
     model = None
     threshold = 0.5  # default

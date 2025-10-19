@@ -339,7 +339,7 @@ def find_optimal_threshold(model, X_val, y_val):
     return optimal_threshold
 
 # Encontrar threshold óptimo en train
-optimal_threshold = find_optimal_threshold(best_model, X_train, y_train)
+optimal_threshold = 0.5 #find_optimal_threshold(best_model, X_train, y_train)
 
 # =============================================================================
 # 5. EVALUACIÓN EN TEST (CON THRESHOLD ÓPTIMO)
