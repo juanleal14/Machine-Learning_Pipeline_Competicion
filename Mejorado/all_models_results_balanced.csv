@@ -1,9 +1,0 @@
-Modelo,Parámetros,BA_CV_Mean,BA_CV_Std,AUC_CV_Mean,PR_CV_Mean,BA_Test,Acc_Test,Prec_Test,Rec_Test,F1_Test,AUC_Test,PR_Test
-GradientBoostingClassifier,"learning_rate=0.15, max_depth=5, min_samples_leaf=7, n_estimators=600, subsample=0.9",0.9071,0.01,0.9614,0.9282,0.9598,0.9802,0.9464,0.9298,0.9381,0.9765,0.9644
-MLPClassifier,"activation=relu, alpha=0.01, hidden_layer_sizes=(50, 50)",0.8399,0.019,0.9062,0.75,0.9333,0.9476,0.7939,0.9123,0.849,0.9537,0.817
-ExtraTreesClassifier,"class_weight=balanced, criterion=gini, max_depth=None, min_samples_leaf=1, min_samples_split=2, n_estimators=200",0.8564,0.0241,0.9781,0.931,0.9158,0.9717,0.9896,0.8333,0.9048,0.9914,0.9716
-RandomForestClassifier,"class_weight=balanced, criterion=gini, max_depth=10, min_samples_leaf=2, min_samples_split=5, n_estimators=300",0.7423,0.0202,0.932,0.7925,0.8266,0.9348,0.9048,0.6667,0.7677,0.9498,0.8512
-KNeighborsClassifier,"leaf_size=15, n_neighbors=9, p=1, weights=uniform",0.7791,0.0294,0.8702,0.6476,0.8229,0.7861,0.4219,0.8772,0.5698,0.904,0.7265
-DecisionTreeClassifier,"class_weight=balanced, criterion=gini, max_depth=10, min_samples_leaf=2, min_samples_split=5",0.7239,0.0327,0.8082,0.501,0.7832,0.8739,0.6016,0.6491,0.6245,0.8644,0.6155
-LogisticRegression,"C=3, class_weight=balanced, penalty=l2, solver=liblinear",0.6881,0.0215,0.7642,0.4181,0.7058,0.7025,0.314,0.7105,0.4355,0.7645,0.4053
-AdaBoostClassifier,"algorithm=SAMME, estimator__max_depth=1, estimator__min_samples_leaf=1, learning_rate=0.1, n_estimators=100",0.6593,0.0226,0.7293,0.4182,0.6774,0.7025,0.3017,0.6404,0.4101,0.7336,0.4209
